@@ -6,7 +6,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const db_1 = __importDefault(require("../db"));
 const router = (0, express_1.Router)();
-// GET /api/servers - List all servers
+/**
+ * @openapi
+ * /api/servers:
+ *   get:
+ *     tags: [Servers]
+ *     summary: List all servers
+ *     description: Returns all servers with their latest metric and open alerts
+ *     responses:
+ *       200:
+ *         description: List of servers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Server'
+ */
 router.get('/', async (req, res) => {
     try {
         const servers = await db_1.default.server.findMany({
@@ -38,7 +59,26 @@ router.get('/', async (req, res) => {
         });
     }
 });
-// GET /api/servers/:id - Get server details with recent metrics and alerts
+/**
+ * @openapi
+ * /api/servers/{id}:
+ *   get:
+ *     tags: [Servers]
+ *     summary: Get server details
+ *     description: Returns server details with 100 recent metrics and 50 alerts
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Server ID
+ *     responses:
+ *       200:
+ *         description: Server details
+ *       404:
+ *         description: Server not found
+ */
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -77,7 +117,36 @@ router.get('/:id', async (req, res) => {
         });
     }
 });
-// POST /api/servers - Create a new server
+/**
+ * @openapi
+ * /api/servers:
+ *   post:
+ *     tags: [Servers]
+ *     summary: Create a new server
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, hostName, status]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: web-prod-01
+ *               hostName:
+ *                 type: string
+ *                 example: 10.0.1.10
+ *               status:
+ *                 type: string
+ *                 enum: [stable, unhealthy, offline]
+ *                 example: stable
+ *     responses:
+ *       201:
+ *         description: Server created
+ *       400:
+ *         description: Missing required fields
+ */
 router.post('/', async (req, res) => {
     try {
         const { name, hostName, status } = req.body;
@@ -112,7 +181,37 @@ router.post('/', async (req, res) => {
         });
     }
 });
-// PUT /api/servers/:id - Update server status
+/**
+ * @openapi
+ * /api/servers/{id}:
+ *   put:
+ *     tags: [Servers]
+ *     summary: Update a server
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               hostName:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [stable, unhealthy, offline]
+ *     responses:
+ *       200:
+ *         description: Server updated
+ *       404:
+ *         description: Server not found
+ */
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -159,7 +258,25 @@ router.put('/:id', async (req, res) => {
         });
     }
 });
-// DELETE /api/servers/:id - Delete server and related data
+/**
+ * @openapi
+ * /api/servers/{id}:
+ *   delete:
+ *     tags: [Servers]
+ *     summary: Delete a server
+ *     description: Deletes the server and cascades to related metrics and alerts
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Server deleted
+ *       404:
+ *         description: Server not found
+ */
 router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;

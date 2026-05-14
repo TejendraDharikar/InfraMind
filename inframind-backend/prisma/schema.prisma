@@ -50,3 +50,13 @@ model Alert {
   @@index([serverId])
   @@index([createdAt])
 }
+
+model Webhook {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  events    String   // Comma-separated list of events e.g. "critical_alert,server_offline"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
