@@ -4,8 +4,8 @@
   "private": true,
   "description": "AI-Powered DevOps Dashboard — Monorepo",
   "workspaces": [
-    "inframind-frontend",
-    "inframind-backend"
+    "apps/inframind-frontend",
+    "apps/inframind-backend"
   ],
   "scripts": {
     "dev:frontend": "yarn nx run inframind-frontend:dev",
