@@ -2,8 +2,10 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
-    "lib": ["ES2020"],
-    "outDir": "./dist",
+    "lib": [
+      "ES2020"
+    ],
+    "outDir": "../../dist/apps/inframind-backend/dist",
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
@@ -14,6 +16,11 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "../../dist/apps/inframind-backend/dist"
+  ]
 }
