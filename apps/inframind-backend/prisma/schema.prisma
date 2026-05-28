@@ -54,13 +54,19 @@ model Subscription {
   endsAt    DateTime?
 }
 
+enum ServerStatus {
+  ONLINE
+  OFFLINE
+  DEGRADED
+}
+
 model Server {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   name      String
   hostName  String
-  status    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  status    ServerStatus
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   metrics   Metric[]
   alerts    Alert[]
@@ -84,17 +90,29 @@ model Metric {
   @@index([timestamp])
 }
 
+enum Severity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AlertStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
 model Alert {
-  id         String    @id @default(cuid())
+  id         String      @id @default(cuid())
   serverId   String
-  server     Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  server     Server      @relation(fields: [serverId], references: [id], onDelete: Cascade)
   type       String
   message    String
-  severity   String
-  status     String
-  createdAt  DateTime  @default(now())
+  severity   Severity
+  status     AlertStatus
+  createdAt  DateTime    @default(now())
   resolvedAt DateTime?
-  user       User?     @relation(fields: [userId], references: [id])
+  user       User?       @relation(fields: [userId], references: [id])
   userId     String?
 
   @@index([serverId])
