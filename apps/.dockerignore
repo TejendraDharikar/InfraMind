@@ -1,0 +1,11 @@
+node_modules
+inframind-backend/node_modules
+inframind-frontend/node_modules
+inframind-backend/dist
+inframind-frontend/.next
+npm-debug.log
+yarn-error.log
+.git
+.husky
+.nx/cache
+*.md

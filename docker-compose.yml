@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: apps/inframind-backend/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - backend_db:/app/apps/inframind-backend/prisma
+    env_file:
+      - .env
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/inframind-frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - backend
+
+volumes:
+  backend_db:

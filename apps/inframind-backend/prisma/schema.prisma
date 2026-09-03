@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String?
+  role          Role           @default(MEMBER)
+  servers       Server[]
+  alerts        Alert[]
+  createdAt     DateTime       @default(now())
+  projects      Project[]
+  subscriptions Subscription[]
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  name      String
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String
+  servers   Server[]
+  createdAt DateTime @default(now())
+}
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+model Subscription {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  plan      Plan
+  status    String
+  startedAt DateTime  @default(now())
+  endsAt    DateTime?
+}
+
+enum ServerStatus {
+  ONLINE
+  OFFLINE
+  DEGRADED
+}
+
+model Server {
+  id        String       @id @default(cuid())
+  name      String
+  hostName  String
+  status    ServerStatus
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  metrics   Metric[]
+  alerts    Alert[]
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+}
+
+model Metric {
+  id           String   @id @default(cuid())
+  serverId     String
+  server       Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  timestamp    DateTime @default(now())
+  cpuUsage     Float
+  memoryUsage  Float
+  networkUsage Float
+  diskUsage    Float
+
+  @@index([serverId])
+  @@index([timestamp])
+}
+
+enum Severity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AlertStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+model Alert {
+  id         String      @id @default(cuid())
+  serverId   String
+  server     Server      @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  type       String
+  message    String
+  severity   Severity
+  status     AlertStatus
+  createdAt  DateTime    @default(now())
+  resolvedAt DateTime?
+  user       User?       @relation(fields: [userId], references: [id])
+  userId     String?
+
+  @@index([serverId])
+  @@index([createdAt])
+}
+
+model Webhook {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  events    String // Comma-separated list of events e.g. "critical_alert,server_offline"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
